@@ -31,14 +31,8 @@ func (s *Server) Start() error {
 
 	r.HandleFunc("/", s.Hello)
 
+	log.Printf("Server is live at http://localhost%s", s.ListenAddr)
 	return http.ListenAndServe(s.ListenAddr, r)
-}
-
-func (s *Server) AddProductToDB(p *Product) error {
-	_, err := s.Storage.Exec(`
-		INSERT INTO Products(UPC, ProductName, ProductDescription, DepartmentID, Price)
-		VALUES (?, ?, ?, ?, ?)`, p.UPC, p.ProductName, p.ProductDescription, p.DepartmentID, p.Price)
-	return err
 }
 
 func (s *Server) Hello(w http.ResponseWriter, r *http.Request) {
