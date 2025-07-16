@@ -1,18 +1,16 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 type Server struct {
 	ListenAddr string
-	Storage    *sql.DB
+	Storage    *Database
 }
 
 type ServerError struct {
@@ -40,10 +38,8 @@ func makeHandlerFunc(f handlerFunc) http.HandlerFunc {
 }
 
 func NewServer(listenAddr string) *Server {
-	db, err := sql.Open("sqlite3", "./inventory.db")
-	if err != nil {
-		log.Fatal(err)
-	}
+
+	db := NewDatabase()
 
 	return &Server{
 		ListenAddr: listenAddr,
