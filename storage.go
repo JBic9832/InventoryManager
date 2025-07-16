@@ -7,7 +7,7 @@ import (
 )
 
 type Database struct {
-	DB *sql.DB
+	Store *sql.DB
 }
 
 func NewDatabase() *Database {
@@ -17,14 +17,15 @@ func NewDatabase() *Database {
 	}
 
 	return &Database{
-		DB: db,
+		Store: db,
 	}
-
 }
 
-func AddProductToDB(s *sql.DB, p Product) error {
-	_, err := s.Exec(`
-		INSERT INTO Products(UPC, ProductName, ProductDescription, DepartmentID, Price)
-		VALUES (?, ?, ?, ?, ?)`, p.UPC, p.ProductName, p.ProductDescription, p.DepartmentID, p.Price)
+func (db *Database) AddUserToDatabase(user *User) error {
+	query := `
+	INSERT INTO Users(UserID, Email, FirstName, LastName, Password)
+	VALUES (?, ?, ?, ?, ?)
+	`
+	_, err := db.Store.Exec(query, user.ID.String(), user.Email, user.FirstName, user.LastName, user.Password)
 	return err
 }

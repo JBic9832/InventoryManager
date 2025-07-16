@@ -1,16 +1,26 @@
 package main
 
 import (
+	"encoding/json"
+	"io"
+
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID        uuid.UUID
-	Email     string
-	FirstName string
-	LastName  string
-	Password  string
+	ID        uuid.UUID `json:"id"`
+	Email     string    `json:"email"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Password  string    `json:"password"`
+}
+
+type CreateUserRequest struct {
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Password  string `json:"password"`
 }
 
 func HashPassword(password string) (string, error) {
@@ -35,4 +45,17 @@ func NewUser(email string, firstName string, lastName string, password string) (
 		LastName:  lastName,
 		Password:  pwHashed,
 	}, err
+}
+
+func CreateUserFromJSON(body io.ReadCloser) (*User, error) {
+	createRequest := new(CreateUserRequest)
+	decoder := json.NewDecoder(body)
+	err := decoder.Decode(createRequest)
+	if err != nil {
+		return &User{}, nil
+	}
+
+	user, err := NewUser(createRequest.Email, createRequest.FirstName, createRequest.LastName, createRequest.Password)
+
+	return user, err
 }
